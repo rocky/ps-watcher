@@ -1,0 +1,35 @@
+# Sample ps-watcher configuration file.
+# We gotta have at least two processes running. Like the OS
+# and the ps-watcher program
+
+patterns:
+
+  p_1:
+    regexp:  /./
+    trigger: @count > 1
+    action:  puts "ok 1"
+    occurs:  first
+
+  # Look for my processes
+  p_2:
+    regexp: ruby
+    action: puts "ok 2 #{@ps_pat}"
+   
+  p_3:
+    regexp: /.?/
+    trigger: elapsed2secs('$etime') >= 0
+    action:  puts "ok 3"
+    occurs:  first
+
+  # I'm assuming there is no process with just a single space.
+  p_4: 
+    regexp: /^ $/
+    action: echo "ok 4"
+    occurs: none
+
+  # Test to see if first-trigger works.
+  p_5:
+    regexp:  /.*/
+    trigger: @pid == $$
+    action:  puts "ok 5"
+    occurs:  first-trigger
