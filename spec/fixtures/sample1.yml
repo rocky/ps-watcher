@@ -2,7 +2,7 @@
 # We gotta have at least two processes running. Like the OS
 # and the ps-watcher program
 
-patterns:
+process_patterns:
 
   p_1:
     regexp:  /./
@@ -12,7 +12,7 @@ patterns:
 
   # Look for my processes
   p_2:
-    regexp: ruby
+    regexp: /ruby/
     action: puts "ok 2 #{@ps_pat}"
    
   p_3:
