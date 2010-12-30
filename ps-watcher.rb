@@ -66,7 +66,7 @@ class PSWatcher
       err("Can't read #{config_file}")
       return
     end
-    @yaml = YAML.load_file(@opts[:config_file])
+    @yaml = YAML.load_file(config_file)
     @yaml['process_patterns'].each do |name, y_section|
       regexp_str = y_section['regexp']
       begin
