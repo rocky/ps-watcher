@@ -2,13 +2,17 @@ require 'yaml'
 class PSWatcher
   DEFAULT_OPTS = {
     :sleep_interval => -1,
-    :debug_level => 2
+    :debug_level => 3,
+    # FIXME: get from OS configuration
+    :ps_prog => '/bin/ps',
+    :ps_pid_opts => '-e -o pid= -o cmd='
   }
 
   PS_Struct = Struct.new(:re, :trigger, :action, :occurs)
   def initialize(opts={})
     @opts = DEFAULT_OPTS.merge(opts)
     @process_sections = []
+    @ps_cmd = "#{@opts[:ps_prog]} #{@opts[:ps_pid_opts]}"; 
     read_config_file if @opts[:config_file]
   end
 
@@ -25,13 +29,35 @@ class PSWatcher
   end
 
   def gather_psinfo
+    `#{@ps_cmd}`.split(/\n/).map do |line|
+      if line =~ /\s*(\d+) (.+)$/
+        [$1.to_i, $2]
+      else
+        nil
+      end
+    end.compact
   end
     
   def make_the_rounds
     debug_log('Making the rounds', 1)
-    @ps_info=gather_psinfo();
+    require 'trepanning'; debugger
+    ps_info=gather_psinfo()
     @process_sections.each do |section|
       debug_log("process pattern: #{section.re}", 1);
+      in_prolog_epilog = false
+      count = 0
+      ps_pat = section.re
+      if ps_pat == /^\$PROLOG/ || ps_pat == /\$EPILOG/ 
+        # Set to run trigger below.
+        count  = @ps_info
+        in_prolog_epilog = true
+      else
+        selected_ps = ps_info.select do |psi|
+          psi[1] =~ ps_pat
+        end
+        count = selected_ps.size
+        debug_log("count for #{ps_pat}: #{count}", 2);
+      end
     end
   end
 
@@ -53,21 +79,25 @@ class PSWatcher
         err("process_pattern section #{name} has invalid regexp #{regexp_str}")
         next
       end
-      action = trigger = nil
+      action = nil
+      trigger = true
       %w(action trigger).each do |field|
         val = eval("y_section[\"#{field}\"]")
         eval("#{field}= #{val.inspect}")
       end
       occurs = y_section['occurs']
-      if occurs
-        occurs.strip!
-        unless %w(none first first-trigger every).member?(occurs)
-          err("process_pattern section #{name} has invalid occurs #{occurs}")
-          next
+      occurs = 
+        if occurs
+          occurs.strip!
+          unless %w(none first first-trigger every).member?(occurs)
+            err("process_pattern section #{name} has invalid occurs #{occurs}")
+            next
+          end
+          occurs.to_sym
+        else
+          :first
         end
-        occurs = occurs.to_sym
-      end
-      section = PS_Struct.new(regexp, action, trigger)
+      section = PS_Struct.new(regexp, action, trigger, occurs)
       @process_sections << section
     end
     @config_file = config_file
