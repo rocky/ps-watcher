@@ -39,8 +39,7 @@ task :default => [:test]
 require 'rake/testtask'
 desc 'Test units - the smaller tests'
 Rake::TestTask.new(:'test:unit') do |t|
-  t.test_files = FileList['test/unit/**/*.rb']
-  # t.pattern = 'test/**/*test-*.rb' # instead of above
+  t.test_files = FileList['test/unit/**/test-*.rb']
   t.verbose = true
 end
 

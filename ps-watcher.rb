@@ -134,14 +134,18 @@ class PSWatcher
   def stat_config_file
     return File::stat(@config_file)
   end
-    
+
+  # Returns new stat if configuration file changed. Otherwise returns nil
   def check_config_file
     stat = stat_config_file
     logger("checking config file #{@config_file}") if @opts[:debug_level] > 1
-    if stat.respond_to?(:mtime) && stat.mtime  && @stat.mtime < stat.mtime  
-      logger("Configuration file #{@config_file} modified; re-reading...");
+    if stat && (stat.size != @stat.size || @stat.mtime < stat.mtime )
+      logger("Configuration file #{@config_file} modified; re-reading...") if 
+        @opts[:debug_level] >= 0
       read_config_file
+      return stat
     end
+    return nil
   end
 
   def run
