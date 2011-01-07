@@ -16,7 +16,7 @@ process_patterns:
     action: puts "ok 2 #{@ps_pat}"
    
   p_3:
-    regexp: /.?/
+    regexp: /./
     trigger: elapsed2secs('$etime') >= 0
     action:  puts "ok 3"
     occurs:  first
@@ -29,7 +29,7 @@ process_patterns:
 
   # Test to see if first-trigger works.
   p_5:
-    regexp:  /.*/
+    regexp:  /./
     trigger: @pid == $$
     action:  puts "ok 5"
     occurs:  first-trigger

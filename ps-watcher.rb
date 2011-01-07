@@ -1,19 +1,25 @@
 require 'yaml'
 class PSWatcher
+  VERSION = '2.0'
   DEFAULT_OPTS = {
     :sleep_interval => -1,
     :debug_level => 3,
     # FIXME: get from OS configuration
     :ps_prog => '/bin/ps',
-    :ps_pid_opts => '-e -o pid= -o cmd='
+    :ps_pid_opts => '-w -w -e -o pid= -o cmd='
   }
 
+  # Information for each section of a ps-watcher configuration file.
   PS_Struct = Struct.new(:re, :trigger, :action, :occurs)
+
   def initialize(opts={})
     @opts = DEFAULT_OPTS.merge(opts)
     @process_sections = []
     @ps_cmd = "#{@opts[:ps_prog]} #{@opts[:ps_pid_opts]}"; 
     read_config_file if @opts[:config_file]
+  end
+
+  def eval_trigger_action(trigger, action)
   end
 
   def logger(msg)
@@ -28,6 +34,8 @@ class PSWatcher
     logger "** debug #{msg}" if @opts[:debug_level] > level 
   end
 
+  # Run a system ps command to get a list of processes and process ids.
+  # Return an Array of tuples where each tuple is [pid, command-name]
   def gather_psinfo
     `#{@ps_cmd}`.split(/\n/).map do |line|
       if line =~ /\s*(\d+) (.+)$/
@@ -40,7 +48,7 @@ class PSWatcher
     
   def make_the_rounds
     debug_log('Making the rounds', 1)
-    require 'trepanning'; debugger
+    # require 'trepanning'; debugger
     ps_info=gather_psinfo()
     @process_sections.each do |section|
       debug_log("process pattern: #{section.re}", 1);
@@ -58,15 +66,34 @@ class PSWatcher
         count = selected_ps.size
         debug_log("count for #{ps_pat}: #{count}", 2);
       end
+      if in_prolog_epilog
+        # execute trigger
+        eval_trigger_action(section.trigger, section.action)
+      elsif :none == section.occurs
+        if 0 == count 
+	  # execute the trigger anyway
+	  eval_trigger_action(section.trigger, section.action)
+        elsif count > 0
+          # FIXME: do stuff here.
+        end
+      end
     end
   end
 
   def read_config_file(config_file=@opts[:config_file])
     unless File.readable?(config_file)
       err("Can't read #{config_file}")
-      return
+      return nil
     end
     @yaml = YAML.load_file(config_file)
+    unless @yaml && @yaml.kind_of?(Hash)
+      err("Problems reading YAML configuration file #{config_file}") 
+      return nil
+    end
+    unless @yaml.member?('process_patterns')
+      err("'process_patterns' section not in YAML configuration file #{config_file}") 
+      return nil
+    end
     @yaml['process_patterns'].each do |name, y_section|
       regexp_str = y_section['regexp']
       begin
@@ -110,9 +137,9 @@ class PSWatcher
     
   def check_config_file
     stat = stat_config_file
-    logger("checking config file #{@conf_file}") if @opts[:debug_level] > 1
+    logger("checking config file #{@config_file}") if @opts[:debug_level] > 1
     if stat.respond_to?(:mtime) && stat.mtime  && @stat.mtime < stat.mtime  
-      logger("Configuration file #{@conf_file} modified; re-reading...");
+      logger("Configuration file #{@config_file} modified; re-reading...");
       read_config_file
     end
   end
