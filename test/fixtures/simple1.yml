@@ -7,6 +7,12 @@ process_patterns:
   p_1:
     regexp:  /./
     trigger: @count > 1
-    action:  puts "ok 1"
+    action:  'puts "ok 1"'
     occurs:  first
+
+  p_2:
+    regexp:  /ruby/
+    trigger: @count >= 1
+    action:  'puts "We got #{@count} items"'
+    occurs:  every
 

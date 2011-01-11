@@ -1,6 +1,8 @@
+#!/usr/bin/env ruby
 require 'yaml'
 class PSWatcher
   VERSION = '2.0'
+  PROGRAM = File.basename(__FILE__, '.rb')
   DEFAULT_OPTS = {
     :sleep_interval => -1,
     :debug_level => 3,
@@ -10,7 +12,7 @@ class PSWatcher
   }
 
   # Information for each section of a ps-watcher configuration file.
-  PS_Struct = Struct.new(:re, :trigger, :action, :occurs)
+  PS_Struct = Struct.new(:re, :action, :trigger, :occurs)
 
   def initialize(opts={})
     @opts = DEFAULT_OPTS.merge(opts)
@@ -19,10 +21,34 @@ class PSWatcher
     read_config_file if @opts[:config_file]
   end
 
-  def eval_trigger_action(trigger, action)
+  def show_version
+    print <<-BANNER
+ps-watcher version #{VERSION} Copyright (C) 2010 Rocky Bernstein.
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+    BANNER
+    exit 10
   end
 
+  # Evaluates the trigger and if that's true also performs
+  # an action. true is returned if the action was performed, 
+  # false otherwise.
+  # FIXME: should set up a closure or block and eval in that context.
+  def eval_trigger_action(trigger, action)
+    debug_log("trigger: #{trigger.inspect}", 2);
+    if !trigger || eval(trigger)
+      debug_log("running action: #{action}", 2);
+      eval action 
+      true
+    else
+      false
+    end
+  end
+
+  # log error to syslog and print to stderr.
   def logger(msg)
+    # Well, perhaps more later...
     puts msg
   end
     
@@ -45,6 +71,12 @@ class PSWatcher
       end
     end.compact
   end
+
+  # Get up full information for process pid.
+  def get_full_ps_info(pid)
+    # puts "FIXME: need to get ps info for #{pid}"
+    return true
+  end
     
   def make_the_rounds
     debug_log('Making the rounds', 1)
@@ -53,28 +85,32 @@ class PSWatcher
     @process_sections.each do |section|
       debug_log("process pattern: #{section.re}", 1);
       in_prolog_epilog = false
-      count = 0
+      @count = 0
       ps_pat = section.re
       if ps_pat == /^\$PROLOG/ || ps_pat == /\$EPILOG/ 
         # Set to run trigger below.
-        count  = @ps_info
+        @count = 1
         in_prolog_epilog = true
       else
         selected_ps = ps_info.select do |psi|
           psi[1] =~ ps_pat
         end
-        count = selected_ps.size
-        debug_log("count for #{ps_pat}: #{count}", 2);
+        @count = selected_ps.size
+        debug_log("@count for #{ps_pat}: #{@count}", 2);
       end
       if in_prolog_epilog
         # execute trigger
         eval_trigger_action(section.trigger, section.action)
       elsif :none == section.occurs
-        if 0 == count 
+        if 0 == @count 
 	  # execute the trigger anyway
 	  eval_trigger_action(section.trigger, section.action)
-        elsif count > 0
-          # FIXME: do stuff here.
+        end
+      elsif @count > 0
+        selected_ps.each do |pid, command|
+          next unless get_full_ps_info(pid)
+	  eval_trigger_action(section.trigger, section.action)
+          break if :first == section.occurs
         end
       end
     end
@@ -156,13 +192,27 @@ class PSWatcher
       break if @opts[:sleep_interval] < 0
     end
   end
+
+#   def self.process_options(stdout=$stdout, stderr=$stderr)
+#     OptionParser.new do |opts|
+#       opts.banner = <<EOB
+# #{show_version}
+# Usage: #{PROGRAM} [options] <script.rb> -- <script.rb parameters>
+# EOB
+#   end
+
+#   def self.main
+#     process_options
+#     psw = PSWatcher.new(:config_file => config_file)
+#   end
+
 end
 
 require 'optparse'
 
 if __FILE__ == $0
   DIR = File.dirname(__FILE__)
-  config_file = File.join(DIR, %w(spec fixtures sample1.yml))
+  config_file = File.join(DIR, %w(test fixtures simple1.yml))
   psw = PSWatcher.new(:config_file => config_file)
   psw.run
 end

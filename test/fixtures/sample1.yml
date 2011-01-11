@@ -24,7 +24,7 @@ process_patterns:
   # I'm assuming there is no process with just a single space.
   p_4: 
     regexp: /^ $/
-    action: echo "ok 4"
+    action: puts "ok 4"
     occurs: none
 
   # Test to see if first-trigger works.
