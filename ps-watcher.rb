@@ -1,11 +1,13 @@
 #!/usr/bin/env ruby
 require 'yaml'
+require_relative 'options.rb'
 class PSWatcher
   VERSION = '2.0'
   PROGRAM = File.basename(__FILE__, '.rb')
   DEFAULT_OPTS = {
     :sleep_interval => -1,
     :debug_level => 3,
+    :logfile => $stdout,
     # FIXME: get from OS configuration
     :ps_prog => '/bin/ps',
     :ps_pid_opts => '-w -w -e -o pid= -o cmd='
@@ -21,7 +23,7 @@ class PSWatcher
     read_config_file if @opts[:config_file]
   end
 
-  def show_version
+  def self.show_version
     print <<-BANNER
 ps-watcher version #{VERSION} Copyright (C) 2010 Rocky Bernstein.
 This is free software; see the source for copying conditions.
@@ -29,6 +31,11 @@ There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE.
     BANNER
     exit 10
+  end
+
+  # Return time and PID as string in a common format
+  def self.timestring
+    Time.now.strftime("%m/%d/%y %H:%M.%S #{PROGRAM}[#{$$}]")
   end
 
   # Evaluates the trigger and if that's true also performs
@@ -48,8 +55,12 @@ PARTICULAR PURPOSE.
 
   # log error to syslog and print to stderr.
   def logger(msg)
-    # Well, perhaps more later...
-    puts msg
+    if @opts[:syslog] 
+      # Well, perhaps more later...
+    end
+    if @opts[:logfile]
+      @opts[:logfile].puts msg
+    end
   end
     
   def err(msg)
