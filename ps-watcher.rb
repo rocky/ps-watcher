@@ -1,18 +1,8 @@
 #!/usr/bin/env ruby
 require 'yaml'
-require_relative 'options.rb'
-class PSWatcher
-  VERSION = '2.0'
-  PROGRAM = File.basename(__FILE__, '.rb')
-  DEFAULT_OPTS = {
-    :sleep_interval => -1,
-    :debug_level => 3,
-    :logfile => $stdout,
-    # FIXME: get from OS configuration
-    :ps_prog => '/bin/ps',
-    :ps_pid_opts => '-w -w -e -o pid= -o cmd='
-  }
+require_relative 'options'
 
+class PSWatcher
   # Information for each section of a ps-watcher configuration file.
   PS_Struct = Struct.new(:re, :action, :trigger, :occurs)
 
@@ -21,21 +11,6 @@ class PSWatcher
     @process_sections = []
     @ps_cmd = "#{@opts[:ps_prog]} #{@opts[:ps_pid_opts]}"; 
     read_config_file if @opts[:config_file]
-  end
-
-  def self.show_version
-    print <<-BANNER
-ps-watcher version #{VERSION} Copyright (C) 2010 Rocky Bernstein.
-This is free software; see the source for copying conditions.
-There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.
-    BANNER
-    exit 10
-  end
-
-  # Return time and PID as string in a common format
-  def self.timestring
-    Time.now.strftime("%m/%d/%y %H:%M.%S #{PROGRAM}[#{$$}]")
   end
 
   # Evaluates the trigger and if that's true also performs
@@ -203,14 +178,6 @@ PARTICULAR PURPOSE.
       break if @opts[:sleep_interval] < 0
     end
   end
-
-#   def self.process_options(stdout=$stdout, stderr=$stderr)
-#     OptionParser.new do |opts|
-#       opts.banner = <<EOB
-# #{show_version}
-# Usage: #{PROGRAM} [options] <script.rb> -- <script.rb parameters>
-# EOB
-#   end
 
 #   def self.main
 #     process_options
