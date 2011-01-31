@@ -3,8 +3,8 @@ require 'optparse'
 require_relative 'single'
 require_relative 'default'
 class PSWatcher
-  def self.setup_options(options, stdout=$stdout, stderr=$stderr)
-    set_default_options
+  def self.setup_options(options=DEFAULT_OPTS, stdout=$stdout, stderr=$stderr)
+    default_opts = set_default_options(options)
     OptionParser.new do |opts|
       opts.on('--version', "show a version string and exit") do 
         version
@@ -17,7 +17,7 @@ class PSWatcher
       end
       opts.on("--sleep SECONDS", Integer, 
               "sleep interval between iterations. The default is " + 
-              "#{DEFAULT_OPTS[:sleep_interval]} seconds.") do |num|
+              "#{default_opts[:sleep_interval]} seconds.") do |num|
         options[:sleep_interval] = num
       end
       opts.on('--ps-prog', 

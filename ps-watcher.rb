@@ -179,10 +179,10 @@ class PSWatcher
     end
   end
 
-#   def self.main
-#     process_options
-#     psw = PSWatcher.new(:config_file => config_file)
-#   end
+  def self.main(config_file)
+    opts = PSWatcher.setup_options
+    psw = PSWatcher.new(:config_file => config_file)
+  end
 
 end
 
@@ -191,6 +191,6 @@ require 'optparse'
 if __FILE__ == $0
   DIR = File.dirname(__FILE__)
   config_file = File.join(DIR, %w(test fixtures simple1.yml))
-  psw = PSWatcher.new(:config_file => config_file)
+  psw = PSWatcher.main(config_file)
   psw.run
 end
