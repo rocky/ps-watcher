@@ -1,7 +1,6 @@
 # Sample ps-watcher configuration file.
 # We gotta have at least two processes running. Like the OS
 # and the ps-watcher program
-
 process_patterns:
 
   p_1:

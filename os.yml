@@ -1,0 +1,128 @@
+# OS ps parameters.
+
+aix:
+    ps_args: -o args=
+    ps_can_return_multiple_lines: false
+    ps_custom_header: true
+    ps_no_null_header: false
+    ps_pid_opts: -e -o pid= -o comm=
+    ps_time_var: etime
+    ps_vars: user ruser group rgroup uid ruid gid rgid ppid 
+             pgid pri cpu pcpu pmem vsz nice class scount thcount tid time
+             etime tty wchan bnd
+
+cygwin: 
+    ps_args: -l | cut -c 2-10,56-120
+    ps_args_fmt: ['$opts{ps_prog} -l |cut -c 2-10,56-120|egrep \"^[ \\t]*%d\"']
+    ps_fullcmd_fmt: ['$opts{ps_prog} -l|cut -c 2-47,56-120|egrep \"^[ \\t]*%d\"']
+    ps_can_return_multiple_lines: false
+    ps_custom_header: false
+    ps_no_null_header: true
+    ps_pid_opts: -l | cut -c 2-10,56-120
+    ps_vars: pid ppid pgid winpid tty uid
+
+solaris:
+    ps_args: -o args=
+    ps_can_return_multiple_lines: true
+    ps_custom_header: false
+    ps_no_null_header: false
+    ps_pid_opts: -e -o pid= -o comm=
+    ps_time_var: etime
+    ps_vars: user ruser group rgroup uid ruid gid rgid ppid
+             pgid sid pri pcpu pmem vsz rss osz nice class time
+             etime stime f s lwp nlwp psr tty addr wchan fname
+
+linux:
+    ps_args: -www -o args=
+    ps_can_return_multiple_lines: false
+    ps_customer_header: true
+    ps_no_null_header: false
+    ps_pid_opts: -e -o pid= -o cmd=
+    # Make sure we put known single tokens at the beginning like uid.
+    ps_vars: uid euid ruid gid egid rgid alarm blocked bsdtime c caught
+             cputime drs dsiz egroup eip esp etime euser f fgid
+             fgroup flag flags fname fsgid fsgroup fsuid fsuser fuid fuser
+             group ignored intpri lim longtname m_drs m_trs maj_flt majflt
+             min_flt  minflt ni nice nwchan opri pagein pcpu pending pgid pgrp
+             pmem ppid pri rgroup rss rssize rsz ruser s sess session
+             sgi_p sgi_rss sgid sgroup sid sig sig_block sig_catch sig_ignore
+             sig_pend sigcatch sigignore sigmask stackp start start_stack 
+             start_time stat state stime suid suser svgid svgroup svuid svuser 
+             sz time timeout tmout tname tpgid trs trss tsiz tt tty tty4 tty8 
+             uid_hack uname user vsize vsz wchan
+    ps_time_var: etime
+
+netbsdelf2: &netbsdelf2
+    ps_args: -o args
+    ps_can_return_multiple_lines: false
+    ps_custom_header: false
+    ps_no_null_header: true
+    ps_pid_opts: -a -x -o pid= -o ucomm=
+    ps_vars: acflag cpu f 
+             inblk jobc ktrace ktracep lim login majflt minflt msgrcv
+             msgsnd nice nivcsw nsigs nswap nvcsw nwchan oublk p_ru
+             paddr pagein pid ppid pri re rgid rlink rss rsz
+             ruid ruser sess sig sigcatch sigignore sigmask sl start state
+             svgid svuid tdev time tpgid tsess tsiz tt tty ucomm uid upr user 
+             vsz wchan xstat
+    ps_time_var: cpu
+
+netbsd: &netbsd
+    ps_args: -O command
+    ps_can_return_multiple_lines: false
+    ps_custom_header: false
+    ps_no_null_header: true
+    ps_pid_opts: -a -x -o pid= -o ucomm=
+    ps_vars: acflag cpu cputime f
+             inblk jobc ktrace ktracep lim login majflt minflt msgrcv
+             msgsnd nice nivcsw nsigs nswap nvcsw nwchan oublk p_ru
+             paddr pagein pid ppid pri re rgid rlink rss rsz
+             ruid ruser sess sig sigcatch sigignore sigmask sl start state
+             svgid svuid tdev time tpgid tsess tsiz tt tty ucomm uid upr user 
+             vsz wchan xstat
+    ps_time_var: cputime
+
+freebsd4: 
+  <<: *netbsd
+
+bsdi4:
+    ps_args: -www -o command
+    ps_can_return_multiple_lines: false
+    ps_custom_header: false
+    ps_no_null_header: true
+    ps_pid_opts: -a -x -o pid= -o ucomm=
+    ps_time_var: cputime
+    ps_vars: acflag cpu cputime f 
+             inblk jobc ktrace ktracep lim login
+             nice nivcsw nsigs nswap nvcsw nwchan oublk p_ru
+             paddr pagein pid ppid pri re rgid rlink rss rsz
+             ruid ruser sess sig sigcatch sigignore sigmask sl start state
+             svgid svuid tdev time tpgid tsess tsiz tt tty ucomm uid upr user 
+             vsz wchan xstat
+
+darwin5:
+    ps_pid_opts: -a -x -o pid= -o ucomm
+    ps_vars: acflag cpu cputime f inblk jobc ktrace ktracep lim login uid 
+             upr user vsz nice nivcsw nsigs nswap nvcsw nwchan oublk p_ru
+             paddr pcpu pagein pid ppid pri re rgid rss rsz 
+             ruid ruser sess sig sigmask sl start state
+             svgid svuid tdev time tpgid tsess tsiz tt tty ucomm 
+             wchan xstat
+    ps_time_var: cputime
+    ps_args: -www -o command
+    ps_no_null_header: true
+    ps_custom_header: false
+    ps_can_return_multiple_lines: false
+
+other:
+    errmsg: "Do not know #{host_os}. Winging it."
+    ps_args:
+    ps_can_return_multiple_lines: false
+    ps_custom_header: false
+    ps_no_null_header: true
+    ps_pid_opts: -e -o pid= -o comm=
+    ps_vars: user ruser group rgroup uid ruid gid rgid ppid 
+             pgid sid pri pcpu pmem vsz rss osz nice class time 
+             etime stime tty addr wchan fname
+    ps_time_var: etime
+
