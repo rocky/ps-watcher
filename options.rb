@@ -1,16 +1,10 @@
 # Options processing part of ps-watcher
 require 'optparse'
 require_relative 'single'
+require_relative 'default'
 class PSWatcher
-  DEFAULT_OPTS = {
-    :sleep_interval => -1,
-    :debug_level => 3,
-    :logfile => $stdout,
-    # FIXME: get from OS configuration
-    :ps_prog => '/bin/ps',
-    :ps_pid_opts => '-w -w -e -o pid= -o cmd='
-  }
   def self.setup_options(options, stdout=$stdout, stderr=$stderr)
+    set_default_options
     OptionParser.new do |opts|
       opts.on('--version', "show a version string and exit") do 
         version

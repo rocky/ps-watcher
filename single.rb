@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
-# Class singleton functions other than option processing.a
+# Class singleton functions other than option processing.
+# Copyright (C) 2010, 2011 Rocky Bernstein <rockyb@rubyforge.net>
+require 'rbconfig'
 class PSWatcher
   VERSION = '2.0'
   PROGRAM = 'ps-watcher'

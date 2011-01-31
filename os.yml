@@ -36,8 +36,10 @@ linux:
     ps_args: -www -o args=
     ps_can_return_multiple_lines: false
     ps_customer_header: true
-    ps_no_null_header: false
     ps_pid_opts: -e -o pid= -o cmd=
+    ps_prog: /bin/ps
+    ps_no_null_header: false
+    ps_time_var: etime
     # Make sure we put known single tokens at the beginning like uid.
     ps_vars: uid euid ruid gid egid rgid alarm blocked bsdtime c caught
              cputime drs dsiz egroup eip esp etime euser f fgid
@@ -50,7 +52,6 @@ linux:
              start_time stat state stime suid suser svgid svgroup svuid svuser 
              sz time timeout tmout tname tpgid trs trss tsiz tt tty tty4 tty8 
              uid_hack uname user vsize vsz wchan
-    ps_time_var: etime
 
 netbsdelf2: &netbsdelf2
     ps_args: -o args
@@ -73,6 +74,8 @@ netbsd: &netbsd
     ps_custom_header: false
     ps_no_null_header: true
     ps_pid_opts: -a -x -o pid= -o ucomm=
+    ps_prog: /bin/ps
+    ps_time_var: cputime
     ps_vars: acflag cpu cputime f
              inblk jobc ktrace ktracep lim login majflt minflt msgrcv
              msgsnd nice nivcsw nsigs nswap nvcsw nwchan oublk p_ru
@@ -80,7 +83,6 @@ netbsd: &netbsd
              ruid ruser sess sig sigcatch sigignore sigmask sl start state
              svgid svuid tdev time tpgid tsess tsiz tt tty ucomm uid upr user 
              vsz wchan xstat
-    ps_time_var: cputime
 
 freebsd4: 
   <<: *netbsd
