@@ -12,7 +12,6 @@ class PSWatcher
   }
 
   def self.set_default_options(default_opts=DEFAULT_OPTS)
-    p default_opts
     base_dir = File.dirname(__FILE__)
     default_os_yaml = YAML.load_file(File.join(base_dir, 'os.yml'))
     target_os = RbConfig::CONFIG['target_os']

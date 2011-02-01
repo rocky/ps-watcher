@@ -4,6 +4,7 @@ class TestGatherPsInfo < Test::Unit::TestCase
   include UnitHelper
 
   def setup
+    PSWatcher.setup_options
     @psw = PSWatcher.new
   end
 
@@ -16,4 +17,3 @@ class TestGatherPsInfo < Test::Unit::TestCase
            "#{pids[0][1]} should match #{$0}")
   end
 end
-

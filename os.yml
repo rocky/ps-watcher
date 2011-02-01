@@ -36,7 +36,7 @@ linux:
     ps_args: -www -o args=
     ps_can_return_multiple_lines: false
     ps_customer_header: true
-    ps_pid_opts: -e -o pid= -o cmd=
+    ps_pid_opts: -www -e -o pid= -o cmd=
     ps_prog: /bin/ps
     ps_no_null_header: false
     ps_time_var: etime
