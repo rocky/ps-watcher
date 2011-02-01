@@ -7,7 +7,7 @@ class PSWatcher
   PROGRAM = 'ps-watcher'
   def self.version
     print <<-BANNER
-ps-watcher version #{VERSION} Copyright (C) 2011 Rocky Bernstein.
+#{PROGRAM} version #{VERSION} Copyright (C) 2011 Rocky Bernstein.
 This is free software; see the source for copying conditions.
 There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE.

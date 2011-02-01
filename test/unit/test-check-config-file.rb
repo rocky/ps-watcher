@@ -2,12 +2,12 @@
 require_relative './helper'
 require 'tmpdir'
 require 'fileutils'
+
+# Check to see if we pick up configuration file changes
 class TestCheckConfigFile < Test::Unit::TestCase
   include UnitHelper
 
   def test_basic
-    # See if we pick up modifications to a config file.
-    # FIXME: to be continued...
     config_name = 'simple1.yml'
     config_file = File.join(Dir::tmpdir, config_name)
     if File.exist?(config_file)

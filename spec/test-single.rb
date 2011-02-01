@@ -17,7 +17,8 @@ describe "PSWatcher singleton method tests" do
     my_exit = double('exit')
     my_exit.should_receive(:exit).with(10)
     my_print = double('print')
-    my_exit.should_receive(:print).with(/version #{PSWatcher::VERSION}/)
+    my_exit.should_receive(:print).
+      with(/#{PSWatcher::PROGRAM} version #{PSWatcher::VERSION}/)
     PSWatcher.class_variable_set('@@double', my_exit)
     PSWatcher.version
   end
