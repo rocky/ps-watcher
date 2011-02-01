@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
+# Copyright (C) 2011 Rocky Bernstein <rockyb@rubyforge.net>
 require 'yaml'
-require_relative 'options'
+require_relative 'app/options'
+require_relative 'app/msg'
 
 class PSWatcher
   # Information for each section of a ps-watcher configuration file.
@@ -9,7 +11,16 @@ class PSWatcher
   def initialize(opts={})
     @opts = DEFAULT_OPTS.merge(opts)
     @process_sections = []
-    @ps_cmd = "#{@opts[:ps_prog]} #{@opts[:ps_pid_opts]}"; 
+    @ps_prog = @opts[:ps_prog] || 'ps'
+    @ps_cmd = "#{@ps_prog} #{@opts[:ps_pid_opts]}"
+    @ps_fullcmd_fmt = 
+      if @opts[:opts_fullcmd_fmt] 
+        @opts[:opts_fullcmd_fmt] 
+      elsif @opts[:ps_vars] 
+        "#{@ps_prog} -p %d -o #{@opts[:ps_vars].gsub(/\s+/,',')}"
+      else
+        "#{@ps_prog} -lp %d"
+      end
     read_config_file if @opts[:config_file]
   end
 
@@ -28,24 +39,6 @@ class PSWatcher
     end
   end
 
-  # log error to syslog and print to stderr.
-  def logger(msg)
-    if @opts[:syslog] 
-      # Well, perhaps more later...
-    end
-    if @opts[:logfile]
-      @opts[:logfile].puts msg
-    end
-  end
-    
-  def err(msg)
-    logger "** error: #{msg}"  
-  end
-
-  def debug_log(msg, level)
-    logger "** debug: #{msg}" if @opts[:debug_level] > level 
-  end
-
   # Run a system ps command to get a list of processes and process ids.
   # Return an Array of tuples where each tuple is [pid, command-name]
   def gather_psinfo
@@ -60,8 +53,10 @@ class PSWatcher
 
   # Get up full information for process pid.
   def get_full_ps_info(pid)
-    # puts "FIXME: need to get ps info for #{pid}"
-    return true
+    ps_fullcmd = @ps_fullcmd_fmt % pid
+    # p ps_fullcmd
+    output = `#{ps_fullcmd}`
+    return output
   end
     
   def make_the_rounds

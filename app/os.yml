@@ -13,8 +13,8 @@ aix:
 
 cygwin: 
     ps_args: -l | cut -c 2-10,56-120
-    ps_args_fmt: ["#{@opts[ps_prog]} -l |cut -c 2-10,56-120|egrep \"^[ \\t]*%d\""]
-    ps_fullcmd_fmt: ["#{@opts[ps_prog]} -l|cut -c 2-47,56-120|egrep \"^[ \\t]*%d\""]
+    ps_args_fmt: ["#{@opts[:ps_prog]} -l |cut -c 2-10,56-120|egrep \"^[ \\t]*%d\""]
+    ps_fullcmd_fmt: ["#{@opts[:ps_prog]} -l|cut -c 2-47,56-120|egrep \"^[ \\t]*%d\""]
     ps_can_return_multiple_lines: false
     ps_custom_header: false
     ps_no_null_header: true
@@ -45,7 +45,7 @@ linux:
              cputime drs dsiz egroup eip esp etime euser f fgid
              fgroup flag flags fname fsgid fsgroup fsuid fsuser fuid fuser
              group ignored intpri lim longtname m_drs m_trs maj_flt majflt
-             min_flt  minflt ni nice nwchan opri pagein pcpu pending pgid pgrp
+             min_flt minflt ni nice nwchan opri pagein pcpu pending pgid pgrp
              pmem ppid pri rgroup rss rssize rsz ruser s sess session
              sgi_p sgi_rss sgid sgroup sid sig sig_block sig_catch sig_ignore
              sig_pend sigcatch sigignore sigmask stackp start start_stack 
