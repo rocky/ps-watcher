@@ -13,8 +13,8 @@ aix:
 
 cygwin: 
     ps_args: -l | cut -c 2-10,56-120
-    ps_args_fmt: ['$opts{ps_prog} -l |cut -c 2-10,56-120|egrep \"^[ \\t]*%d\"']
-    ps_fullcmd_fmt: ['$opts{ps_prog} -l|cut -c 2-47,56-120|egrep \"^[ \\t]*%d\"']
+    ps_args_fmt: ["#{@opts[ps_prog]} -l |cut -c 2-10,56-120|egrep \"^[ \\t]*%d\""]
+    ps_fullcmd_fmt: ["#{@opts[ps_prog]} -l|cut -c 2-47,56-120|egrep \"^[ \\t]*%d\""]
     ps_can_return_multiple_lines: false
     ps_custom_header: false
     ps_no_null_header: true

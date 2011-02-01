@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require_relative './helper'
 class TestReadConfig < Test::Unit::TestCase
   include UnitHelper

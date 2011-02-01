@@ -39,11 +39,11 @@ class PSWatcher
   end
     
   def err(msg)
-    logger "** errors #{msg}"  
+    logger "** error: #{msg}"  
   end
 
   def debug_log(msg, level)
-    logger "** debug #{msg}" if @opts[:debug_level] > level 
+    logger "** debug: #{msg}" if @opts[:debug_level] > level 
   end
 
   # Run a system ps command to get a list of processes and process ids.
@@ -109,7 +109,7 @@ class PSWatcher
     end
     @yaml = YAML.load_file(config_file)
     unless @yaml && @yaml.kind_of?(Hash)
-      err("Problems reading YAML configuration file #{config_file}") 
+      err("Problem reading YAML configuration file #{config_file}") 
       return nil
     end
     unless @yaml.member?('process_patterns')
