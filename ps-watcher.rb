@@ -21,7 +21,12 @@ class PSWatcher
       else
         "#{@ps_prog} -lp %d"
       end
+      
     read_config_file if @opts[:config_file]
+  end
+
+  def finalize
+    @syslog.close if @syslog
   end
 
   # Evaluates the trigger and if that's true also performs
@@ -175,8 +180,10 @@ class PSWatcher
   end
 
   def self.main(config_file)
-    opts = PSWatcher.setup_options
-    psw = PSWatcher.new(:config_file => config_file)
+    setup_options = {}
+    opts = PSWatcher.setup_options(setup_options)
+    setup_options[:config_file] = config_file
+    psw = PSWatcher.new(setup_options)
   end
 
 end

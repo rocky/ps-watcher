@@ -10,6 +10,7 @@ aix:
     ps_vars: user ruser group rgroup uid ruid gid rgid ppid 
              pgid pri cpu pcpu pmem vsz nice class scount thcount tid time
              etime tty wchan bnd
+    pid_dir: /var/run
 
 cygwin: 
     ps_args: -l | cut -c 2-10,56-120
@@ -20,6 +21,7 @@ cygwin:
     ps_no_null_header: true
     ps_pid_opts: -l | cut -c 2-10,56-120
     ps_vars: pid ppid pgid winpid tty uid
+    pid_dir: /var/run
 
 solaris:
     ps_args: -o args=
@@ -31,6 +33,7 @@ solaris:
     ps_vars: user ruser group rgroup uid ruid gid rgid ppid
              pgid sid pri pcpu pmem vsz rss osz nice class time
              etime stime f s lwp nlwp psr tty addr wchan fname
+    pid_dir: /var/run
 
 linux:
     ps_args: -www -o args=
@@ -52,6 +55,7 @@ linux:
              start_time stat state stime suid suser svgid svgroup svuid svuser 
              sz time timeout tmout tname tpgid trs trss tsiz tt tty tty4 tty8 
              uid_hack uname user vsize vsz wchan
+    pid_dir: /var/run
 
 netbsdelf2: &netbsdelf2
     ps_args: -o args
@@ -67,6 +71,7 @@ netbsdelf2: &netbsdelf2
              svgid svuid tdev time tpgid tsess tsiz tt tty ucomm uid upr user 
              vsz wchan xstat
     ps_time_var: cpu
+    pid_dir: /var/run
 
 netbsd: &netbsd
     ps_args: -O command
@@ -83,6 +88,7 @@ netbsd: &netbsd
              ruid ruser sess sig sigcatch sigignore sigmask sl start state
              svgid svuid tdev time tpgid tsess tsiz tt tty ucomm uid upr user 
              vsz wchan xstat
+    pid_dir: /var/run
 
 freebsd4: 
   <<: *netbsd
@@ -101,6 +107,7 @@ bsdi4:
              ruid ruser sess sig sigcatch sigignore sigmask sl start state
              svgid svuid tdev time tpgid tsess tsiz tt tty ucomm uid upr user 
              vsz wchan xstat
+    pid_dir: /var/run
 
 darwin5:
     ps_pid_opts: -a -x -o pid= -o ucomm
@@ -115,6 +122,7 @@ darwin5:
     ps_no_null_header: true
     ps_custom_header: false
     ps_can_return_multiple_lines: false
+    pid_dir: /var/run
 
 other:
     errmsg: "Do not know #{host_os}. Winging it."
@@ -127,4 +135,5 @@ other:
              pgid sid pri pcpu pmem vsz rss osz nice class time 
              etime stime tty addr wchan fname
     ps_time_var: etime
+    pid_dir: /var/run
 

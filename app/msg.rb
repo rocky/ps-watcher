@@ -2,12 +2,7 @@
 class PSWatcher
   # log error to syslog and print to stderr.
   def logger(msg)
-    if @opts[:syslog] 
-      # Well, perhaps more later...
-    end
-    if @opts[:logfile]
-      @opts[:logfile].puts msg
-    end
+    @opts[:logfile].puts msg if @opts[:logfile]
   end
     
   def err(msg)
